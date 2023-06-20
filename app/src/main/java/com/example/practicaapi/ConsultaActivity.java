@@ -30,12 +30,9 @@ public class ConsultaActivity extends AppCompatActivity {
         String imagen = extras.getString("imagen");
         txt_info.setText(informacion);
         Picasso.get().load(imagen).error(R.mipmap.ic_launcher).into(img1);
-        btnVolver.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ConsultaActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
+        btnVolver.setOnClickListener(view -> {
+            Intent intent = new Intent(ConsultaActivity.this, MainActivity.class);
+            startActivity(intent);
         });
     }
 }

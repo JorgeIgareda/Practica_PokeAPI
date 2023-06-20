@@ -6,11 +6,16 @@ import com.google.gson.annotations.SerializedName;
 public class Pokemon {
     @SerializedName("name")
     @Expose
-    private String name;
+    private final String name;
 
     @SerializedName("url")
     @Expose
-    private String url;
+    private final String url;
+
+    public Pokemon(String name, String url) {
+        this.name = name;
+        this.url = url;
+    }
 
     public String getName() {
         return name;
@@ -18,14 +23,6 @@ public class Pokemon {
 
     public String getUrl() {
         return url;
-    }
-
-    public void setName(String name) {
-       this.name = name;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
     public String getDescription() {
         return "It's " + getName() + "!";

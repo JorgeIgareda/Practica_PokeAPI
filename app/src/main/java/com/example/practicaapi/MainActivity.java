@@ -7,16 +7,14 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.practicaapi.adapters.AdaptadorPokemon;
 import com.example.practicaapi.interfaces.RecyclerViewInterface;
 import com.example.practicaapi.model.ListaPokemon;
 import com.example.practicaapi.model.ModeloRetorno;
+import com.example.practicaapi.network.ConsultasApi;
 import com.google.android.material.textfield.TextInputEditText;
-import com.squareup.picasso.Picasso;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -48,12 +46,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         // Controla lo que hace la aplicación cuando el usuario pulsa
         // el botón "CONSULTAR" (debe mostrar los datos y el sprite frontal
         // del pokémon solicitado).
-        btnConsultar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (txtConsulta.getText() != null) {
-                    consultaPokemon(txtConsulta.getText().toString());
-                }
+        btnConsultar.setOnClickListener(view -> {
+            if (txtConsulta.getText() != null) {
+                consultaPokemon(txtConsulta.getText().toString().toLowerCase().trim());
             }
         });
 
@@ -67,38 +62,29 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         // Controla lo que hace la aplicación cuando el usuario pulsa
         // el botón "VER 50 PRIMEROS" (debe mostrar el nombre e imagen
         // de los 50 primeros pokémon).
-        btnVer50.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                offset = 0;
-                muestraLista(offset);
+        btnVer50.setOnClickListener(view -> {
+            offset = 0;
+            muestraLista(offset);
+            btnVer50Siguientes.setVisibility(View.VISIBLE);
+        });
+
+        btnVer50Siguientes.setOnClickListener(view -> {
+            offset += 50;
+            muestraLista(offset);
+            if (offset == 50) {
+                btnVer50Anteriores.setVisibility(View.VISIBLE);
+            } else if (offset == 1250) {
+                btnVer50Siguientes.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        btnVer50Anteriores.setOnClickListener(view -> {
+            offset -= 50;
+            muestraLista(offset);
+            if (offset == 0) {
+                btnVer50Anteriores.setVisibility(View.INVISIBLE);
+            } else if (offset == 1200) {
                 btnVer50Siguientes.setVisibility(View.VISIBLE);
-            }
-        });
-
-        btnVer50Siguientes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                offset+=50;
-                muestraLista(offset);
-                if (offset == 50) {
-                    btnVer50Anteriores.setVisibility(View.VISIBLE);
-                } else if (offset == 1250) {
-                    btnVer50Siguientes.setVisibility(View.INVISIBLE);
-                }
-            }
-        });
-
-        btnVer50Anteriores.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                offset-=50;
-                muestraLista(offset);
-                if (offset == 0) {
-                    btnVer50Anteriores.setVisibility(View.INVISIBLE);
-                } else if (offset == 1200) {
-                    btnVer50Siguientes.setVisibility(View.VISIBLE);
-                }
             }
         });
 
@@ -157,22 +143,21 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             rg.respuesta(nombre);
             muestraToast("Procesando...");
             final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    pokedex = rg.modeloRetorno;
+            handler.postDelayed(() -> {
+                pokedex = rg.getModeloRetorno();
+                if (pokedex.getId() != null) {
                     respuesta = "ID: " + pokedex.getId() + "\n" +
                             "Nombre: " + pokedex.getName() + "\n" +
                             "Altura: " + pokedex.getHeight() + " m \n" +
                             "Peso: " + pokedex.getWeight() + " kg";
                     imagen = pokedex.getFront_default();
-                    if (!respuesta.equals("")) {
-                        Intent intent = new Intent(MainActivity.this, ConsultaActivity.class);
+                    Intent intent = new Intent(MainActivity.this, ConsultaActivity.class);
 
-                        intent.putExtra("informacion", respuesta);
-                        intent.putExtra("imagen", imagen);
-                        startActivity(intent);
-                    }
+                    intent.putExtra("informacion", respuesta);
+                    intent.putExtra("imagen", imagen);
+                    startActivity(intent);
+                } else {
+                    muestraToast("Error: No existe ese pokémon.");
                 }
             }, 1000);
         } catch (Exception e) {
@@ -183,7 +168,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
     /**
      * Consulta en la API el nombre e imagen de los 50 primeros pokémon a partir de un offset
-     * @param offset
+     *
+     * @param offset offset de la lista
      */
     public void muestraLista(int offset) {
         ConsultasApi rg = new ConsultasApi();
@@ -191,13 +177,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
             rg.lista(offset);
             muestraToast("Procesando...");
             final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    listaPokemon = rg.listaPokemon;
-                    adaptadorPokemon = new AdaptadorPokemon(getApplicationContext(), listaPokemon, offset, MainActivity.this);
-                    rvPokemon.setAdapter(adaptadorPokemon);
-                }
+            handler.postDelayed(() -> {
+                listaPokemon = rg.getListaPokemon();
+                adaptadorPokemon = new AdaptadorPokemon(getApplicationContext(), listaPokemon, offset, MainActivity.this);
+                rvPokemon.setAdapter(adaptadorPokemon);
             }, 1000);
         } catch (Exception e) {
             muestraToast("Error: " + e);

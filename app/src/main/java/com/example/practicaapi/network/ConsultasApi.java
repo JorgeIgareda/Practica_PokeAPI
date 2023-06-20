@@ -1,4 +1,4 @@
-package com.example.practicaapi;
+package com.example.practicaapi.network;
 
 import android.util.Log;
 import android.widget.Toast;
@@ -24,9 +24,8 @@ public class ConsultasApi {
 
     public static String url = "https://pokeapi.co/api/v2/";
     private static Retrofit retrofit;
-    ModeloRetorno modeloRetorno = new ModeloRetorno();
-    ListaPokemon listaPokemon = new ListaPokemon();
-    public String res;
+    private ModeloRetorno modeloRetorno = new ModeloRetorno();
+    private ListaPokemon listaPokemon = new ListaPokemon();
 
     public void respuesta(String id) {
 
@@ -88,5 +87,13 @@ public class ConsultasApi {
             }
         });
 
+    }
+
+    public ModeloRetorno getModeloRetorno () {
+        return modeloRetorno;
+    }
+
+    public ListaPokemon getListaPokemon() {
+        return listaPokemon;
     }
 }

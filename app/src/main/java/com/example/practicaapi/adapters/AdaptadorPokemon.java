@@ -1,4 +1,4 @@
-package com.example.practicaapi;
+package com.example.practicaapi.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.practicaapi.R;
 import com.example.practicaapi.interfaces.RecyclerViewInterface;
 import com.example.practicaapi.model.ListaPokemon;
 import com.example.practicaapi.model.Pokemon;

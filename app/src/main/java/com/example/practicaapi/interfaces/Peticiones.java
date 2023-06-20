@@ -1,11 +1,7 @@
 package com.example.practicaapi.interfaces;
 
 import com.example.practicaapi.model.ListaPokemon;
-import com.example.practicaapi.model.Pokemon;
 import com.example.practicaapi.model.Pokedex;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
